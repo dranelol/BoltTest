@@ -22,8 +22,8 @@ public class Menu : Bolt.GlobalEventListener
     {
         if (GUILayout.Button("Start Server", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
         {
-            BoltLauncher.StartServer(UdpKit.UdpEndPoint.Parse("0.0.0.0:27000"));
-            //BoltLauncher.StartServer(UdpKit.UdpEndPoint.Any);
+            //BoltLauncher.StartServer(UdpKit.UdpEndPoint.Parse("127.0.0.1:27000"));
+            BoltLauncher.StartServer(UdpKit.UdpEndPoint.Any);
 
             BoltNetwork.SetHostInfo("Here You Go", null);
             BoltNetwork.LoadScene("Tutorial1");
