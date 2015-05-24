@@ -24,7 +24,8 @@ public class Menu : Bolt.GlobalEventListener
         {
             BoltLauncher.StartServer(UdpKit.UdpEndPoint.Parse("0.0.0.0:27000"));
             //BoltLauncher.StartServer(UdpKit.UdpEndPoint.Any);
-            BoltNetwork.SetHostInfo("Mommmmaaaaaaaaa", null);
+
+            BoltNetwork.SetHostInfo("Here You Go", null);
             BoltNetwork.LoadScene("Tutorial1");
         }
 
@@ -55,7 +56,7 @@ public class Menu : Bolt.GlobalEventListener
         {
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label(session.Value.HostName + " " + session.Value.LanEndPoint);
+            GUILayout.Label(session.Value.HostName + " " + session.Value.WanEndPoint + " " + session.Value.LanEndPoint);
 
             if (GUILayout.Button("Join"))
             {
