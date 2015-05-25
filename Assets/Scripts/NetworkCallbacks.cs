@@ -8,10 +8,10 @@ public class NetworkCallbacks : Bolt.GlobalEventListener
     public override void SceneLoadLocalDone(string map)
     {
         // randomize a position
-        var pos = new Vector3(Random.Range(-16, 16), 2, Random.Range(-16, 16));
+        var pos = new Vector3(Random.Range(-5, 5), 0, Random.Range(-5, 5));
 
         // instantiate cube
-        BoltNetwork.Instantiate(BoltPrefabs.Sphere, pos, Quaternion.identity);
+        BoltNetwork.Instantiate(BoltPrefabs.Robot, pos, Quaternion.identity);
     }
 
     List<string> logMessages = new List<string>();
@@ -26,7 +26,7 @@ public class NetworkCallbacks : Bolt.GlobalEventListener
         // only display max the 5 latest log messages
         int maxMessages = Mathf.Min(5, logMessages.Count);
 
-        GUILayout.BeginArea(new Rect(Screen.width / 2 - 200, Screen.height - 100, 400, 100), GUI.skin.box);
+        GUILayout.BeginArea(new Rect(Screen.width / 2 - 400, Screen.height - 100, 400, 100), GUI.skin.box);
 
         for (int i = 0; i < maxMessages; ++i)
         {
