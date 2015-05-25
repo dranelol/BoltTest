@@ -14,6 +14,15 @@ public class DBManager : MonoBehaviour
     [SerializeField]
     private int authLevel;
 
+    [SerializeField]
+    private string loginName;
+
+    [SerializeField]
+    private string loginPassword;
+
+    [SerializeField]
+    private string loginIP;
+
 
     private void Awake()
     {
@@ -61,12 +70,10 @@ public class DBManager : MonoBehaviour
 
     public IEnumerator AccountCreate()
     {
-        string name = "Matt";
-        string password = "test123";
 
         string getUrl = createAccountURL +
-            "Name=" + WWW.EscapeURL(name) +
-            "&Password=" + WWW.EscapeURL(password) +
+            "Name=" + WWW.EscapeURL(loginName) +
+            "&Password=" + WWW.EscapeURL(loginPassword) +
             "&Key=" + WWW.EscapeURL(key) +
             "&AuthLevel=" + authLevel;
 
@@ -98,15 +105,12 @@ public class DBManager : MonoBehaviour
 
     public IEnumerator Login()
     {
-        string name = "Matt";
-        string password = "test123";
-        string ip = "76.72.4.40";
 
         string getUrl = loginURL +
-            "Name=" + WWW.EscapeURL(name) +
-            "&Password=" + WWW.EscapeURL(password) +
+            "Name=" + WWW.EscapeURL(loginName) +
+            "&Password=" + WWW.EscapeURL(loginPassword) +
             "&Key=" + WWW.EscapeURL(key) +
-            "&CurrentIP=" + WWW.EscapeURL(ip);
+            "&CurrentIP=" + WWW.EscapeURL(loginIP);
 
         WWW login = new WWW(getUrl);
 
