@@ -49,6 +49,11 @@ public class DBManager : MonoBehaviour
         {
             StartCoroutine(AccountCreate());
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            StartCoroutine(Login());
+        }
     }
 
     public IEnumerator AccountCreate()
@@ -62,18 +67,18 @@ public class DBManager : MonoBehaviour
             "&Key=" + WWW.EscapeURL(key) +
             "&AuthLevel=" + authLevel;
 
-        WWW createAccountGet = new WWW(getUrl);
+        WWW createAccount = new WWW(getUrl);
 
-        yield return createAccountGet;
+        yield return createAccount;
 
-        if (createAccountGet.error != null)
+        if (createAccount.error != null)
         {
-            Debug.Log("There was an error creating the account: " + createAccountGet.error);
+            Debug.Log("There was an error creating the account: " + createAccount.error);
         }
 
         else
         {
-            if(createAccountGet.text == "")
+            if(createAccount.text == "")
             {
                 Debug.Log("account created successfully!");
             }
@@ -81,9 +86,8 @@ public class DBManager : MonoBehaviour
             else
             {
                 Debug.Log("An error occured!");
-                Debug.Log(createAccountGet.text);
+                Debug.Log(createAccount.text);
             }
-            
         }
 
         yield return null;
@@ -91,6 +95,38 @@ public class DBManager : MonoBehaviour
 
     public IEnumerator Login()
     {
+        string name = "Matt";
+        string password = "test123";
+        string ip = "76.72.4.40";
+
+        string getUrl = loginURL +
+            "Name=" + WWW.EscapeURL(name) +
+            "&Password=" + WWW.EscapeURL(password) +
+            "&Key=" + WWW.EscapeURL(key) +
+            "&CurrentIP=" + WWW.EscapeURL(ip);
+
+        WWW login = new WWW(getUrl);
+
+        yield return login;
+
+        if (login.error != null)
+        {
+            Debug.Log("There was an error logging in: " + login.error);
+        }
+
+        else
+        {
+            if (login.text == "")
+            {
+                Debug.Log("Login successful!");
+            }
+
+            else
+            {
+                Debug.Log("An error occured!");
+                Debug.Log(login.text);
+            }
+        }
 
         yield return null;
     }
