@@ -27,6 +27,9 @@ public class DBManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+
+        
     }
 
     public static DBManager Instance
