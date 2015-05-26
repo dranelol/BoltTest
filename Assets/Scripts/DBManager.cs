@@ -23,7 +23,9 @@ public class DBManager : MonoBehaviour
     [SerializeField]
     private string loginPassword;
 
-    private string loginIP;
+    public string loginIP;
+
+    public bool SettingIP = false;
 
 
     private void Awake()
@@ -143,6 +145,8 @@ public class DBManager : MonoBehaviour
 
     public IEnumerator SetPublicIP()
     {
+        SettingIP = true;
+
         WWW myExtIPWWW = new WWW("http://checkip.dyndns.org");
 
         if(myExtIPWWW == null)
@@ -165,7 +169,7 @@ public class DBManager : MonoBehaviour
             yield return null;
         }
 
-        
+        SettingIP = false;
 
     }
 

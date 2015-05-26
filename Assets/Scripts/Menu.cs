@@ -10,7 +10,8 @@ public class Menu : Bolt.GlobalEventListener
         SelectPeer,
         ServerBrowser,
         SelectCredentials,
-        LoggingIn
+        LoggingIn,
+        LoggedIn
     }
 
     State state = State.SelectPeer;
@@ -108,17 +109,36 @@ public class Menu : Bolt.GlobalEventListener
 
             state = State.LoggingIn;
         }
-
-
-            
+ 
         GUILayout.EndVertical();
     }
 
     void LoggingIn()
     {
         GUILayout.BeginVertical(GUI.skin.box);
-        // build a credentials token to connect to the server with
-        //BoltNetwork.Connect(session.Value, token);
+
+        if (DBManager.Instance.SettingIP == true)
+        {
+            GUILayout.Label("Logging in...");
+        }
+
+        else
+        {
+            // build a credentials token to connect to the server with
+            state = State.LoggedIn;
+
+            CredentialToken token = new CredentialToken();
+            token.AuthLevel = 0;
+            token.DisplayName = "";
+            token.LoginName = inputUserName;
+            token.Password = inputPassword;
+            token.IP = DBManager.Instance.loginIP;
+
+            BoltNetwork.Connect(selectedSession, token);
+        }
+
+
+        
         GUILayout.EndVertical();
     }
 
