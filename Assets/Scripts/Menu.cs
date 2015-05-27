@@ -104,8 +104,7 @@ public class Menu : Bolt.GlobalEventListener
             Debug.Log(inputUserName);
             Debug.Log(inputPassword);
 
-
-            StartCoroutine(DBManager.Instance.SetPublicIP());
+            StartCoroutine(ClientManager.Instance.SetPublicIP());
 
             state = State.LoggingIn;
         }
@@ -117,7 +116,7 @@ public class Menu : Bolt.GlobalEventListener
     {
         GUILayout.BeginVertical(GUI.skin.box);
 
-        if (DBManager.Instance.SettingIP == true)
+        if (ClientManager.Instance.SettingIP == true)
         {
             GUILayout.Label("Logging in...");
         }
@@ -132,7 +131,7 @@ public class Menu : Bolt.GlobalEventListener
             token.DisplayName = "";
             token.LoginName = inputUserName;
             token.Password = inputPassword;
-            token.IP = DBManager.Instance.loginIP;
+            token.IP = ClientManager.Instance.loginIP;
 
             BoltNetwork.Connect(selectedSession, token);
         }
