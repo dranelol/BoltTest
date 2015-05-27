@@ -2,7 +2,7 @@
 using System.Collections;
 using Bolt;
 
-public class Menu : Bolt.GlobalEventListener
+public class Menu : MonoBehaviour
 {
 
     enum State
@@ -23,15 +23,13 @@ public class Menu : Bolt.GlobalEventListener
 
     private string inputDisplayName;
 
-    public override void ZeusConnected(UdpKit.UdpEndPoint endpoint)
-    {
-        Bolt.Zeus.RequestSessionList();
-    }
+    
 
     void SelectPeer()
     {
         if (GUILayout.Button("Start Server", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
         {
+            Instantiate(GameManager.Instance.ServerManagerGO);
             //BoltLauncher.StartServer(UdpKit.UdpEndPoint.Parse("127.0.0.1:27000"));
             BoltLauncher.StartServer(UdpKit.UdpEndPoint.Any);
 
@@ -41,6 +39,7 @@ public class Menu : Bolt.GlobalEventListener
 
         if (GUILayout.Button("Start Client", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
         {
+            Instantiate(GameManager.Instance.ClientManagerGO);
             BoltLauncher.StartClient();
             state = State.ServerBrowser;
         }
@@ -136,8 +135,6 @@ public class Menu : Bolt.GlobalEventListener
             BoltNetwork.Connect(selectedSession, token);
         }
 
-
-        
         GUILayout.EndVertical();
     }
 

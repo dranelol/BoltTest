@@ -11,6 +11,11 @@ public class NetworkCallbacks : Bolt.GlobalEventListener
         BoltNetwork.RegisterTokenClass<PlayerCustomizationToken>();
     }
 
+    public override void ZeusConnected(UdpKit.UdpEndPoint endpoint)
+    {
+        Bolt.Zeus.RequestSessionList();
+    }
+
 
     public override void SceneLoadLocalDone(string map)
     {

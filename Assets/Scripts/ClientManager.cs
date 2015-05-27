@@ -22,7 +22,15 @@ public class ClientManager : MonoBehaviour
 
     public string loginIP;
 
-    public bool SettingIP = false;
+    private bool settingIP;
+
+    public bool SettingIP
+    {
+        get
+        {
+            return settingIP;
+        }
+    }
 
     private static ClientManager _instance;
 
@@ -140,7 +148,7 @@ public class ClientManager : MonoBehaviour
 
     public IEnumerator SetPublicIP()
     {
-        SettingIP = true;
+        settingIP = true;
 
         WWW myExtIPWWW = new WWW("http://checkip.dyndns.org");
 
@@ -164,7 +172,7 @@ public class ClientManager : MonoBehaviour
             yield return null;
         }
 
-        SettingIP = false;
+        settingIP = false;
 
     }
 
