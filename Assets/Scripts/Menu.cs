@@ -8,10 +8,20 @@ public class Menu : Bolt.GlobalEventListener
     enum State
     {
         SelectPeer,
-        ServerBrowser
+        ServerBrowser,
+        SelectCredentials,
+        LoggingIn,
+        LoggedIn
     }
 
     State state = State.SelectPeer;
+
+    private UdpKit.UdpSession selectedSession = null;
+
+    private string inputUserName = "";
+    private string inputPassword = "";
+
+    private string inputDisplayName;
 
     public override void ZeusConnected(UdpKit.UdpEndPoint endpoint)
     {
@@ -48,6 +58,8 @@ public class Menu : Bolt.GlobalEventListener
 
     void ServerBrowser()
     {
+        selectedSession = null;
+
         GUILayout.Label("Server Browser");
 
         GUILayout.BeginVertical(GUI.skin.box);
@@ -56,16 +68,77 @@ public class Menu : Bolt.GlobalEventListener
         {
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label(session.Value.HostName + " " + session.Value.WanEndPoint + " " + session.Value.LanEndPoint);
+            GUILayout.Label(session.Value.HostName + " " + session.Value.WanEndPoint);
 
             if (GUILayout.Button("Join"))
             {
-                BoltNetwork.Connect(session.Value);
+                // transition to "log in" gui state
+
+                selectedSession = session.Value;
+                state = State.SelectCredentials;
+
+                // build a credentials token to connect to the server with
+                //BoltNetwork.Connect(session.Value, token);
+
+
+                //BoltNetwork.Connect(session.Value);
             }
 
             GUILayout.EndHorizontal();
         }
 
+        GUILayout.EndVertical();
+    }
+
+    void SelectCredentials()
+    {
+        GUILayout.Label("Log in: " + selectedSession.HostName + " | " + selectedSession.WanEndPoint.Address);
+
+        GUILayout.BeginVertical(GUI.skin.box);
+
+        inputUserName = GUILayout.TextField(inputUserName, 20);
+        inputPassword = GUILayout.TextField(inputPassword, 20);
+
+        if (GUILayout.Button("Log in"))
+        {
+            Debug.Log(inputUserName);
+            Debug.Log(inputPassword);
+
+
+            StartCoroutine(DBManager.Instance.SetPublicIP());
+
+            state = State.LoggingIn;
+        }
+ 
+        GUILayout.EndVertical();
+    }
+
+    void LoggingIn()
+    {
+        GUILayout.BeginVertical(GUI.skin.box);
+
+        if (DBManager.Instance.SettingIP == true)
+        {
+            GUILayout.Label("Logging in...");
+        }
+
+        else
+        {
+            // build a credentials token to connect to the server with
+            state = State.LoggedIn;
+
+            CredentialToken token = new CredentialToken();
+            token.AuthLevel = 0;
+            token.DisplayName = "";
+            token.LoginName = inputUserName;
+            token.Password = inputPassword;
+            token.IP = DBManager.Instance.loginIP;
+
+            BoltNetwork.Connect(selectedSession, token);
+        }
+
+
+        
         GUILayout.EndVertical();
     }
 
@@ -77,6 +150,9 @@ public class Menu : Bolt.GlobalEventListener
         {
             case State.SelectPeer: SelectPeer(); break;
             case State.ServerBrowser: ServerBrowser(); break;
+            case State.SelectCredentials: SelectCredentials(); break;
+            case State.LoggingIn: LoggingIn(); break;
+            
         }
 
         GUILayout.EndArea();

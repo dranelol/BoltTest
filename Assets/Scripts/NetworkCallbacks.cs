@@ -5,6 +5,13 @@ using System.Collections.Generic;
 [BoltGlobalBehaviour]
 public class NetworkCallbacks : Bolt.GlobalEventListener
 {
+    public override void BoltStarted()
+    {
+        BoltNetwork.RegisterTokenClass<CredentialToken>();
+        BoltNetwork.RegisterTokenClass<PlayerCustomizationToken>();
+    }
+
+
     public override void SceneLoadLocalDone(string map)
     {
         // randomize a position
@@ -35,4 +42,6 @@ public class NetworkCallbacks : Bolt.GlobalEventListener
 
         GUILayout.EndArea();
     }
+
+    
 }

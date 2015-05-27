@@ -18,10 +18,14 @@ public class DBManager : MonoBehaviour
     private string loginName;
 
     [SerializeField]
-    private string loginPassword;
+    private string displayName;
 
     [SerializeField]
-    private string loginIP;
+    private string loginPassword;
+
+    public string loginIP;
+
+    public bool SettingIP = false;
 
 
     private void Awake()
@@ -70,9 +74,9 @@ public class DBManager : MonoBehaviour
 
     public IEnumerator AccountCreate()
     {
-
         string getUrl = createAccountURL +
             "Name=" + WWW.EscapeURL(loginName) +
+            "LoginName=" + WWW.EscapeURL(displayName) +
             "&Password=" + WWW.EscapeURL(loginPassword) +
             "&Key=" + WWW.EscapeURL(key) +
             "&AuthLevel=" + authLevel;
@@ -108,6 +112,7 @@ public class DBManager : MonoBehaviour
 
         string getUrl = loginURL +
             "Name=" + WWW.EscapeURL(loginName) +
+            "LoginName=" + WWW.EscapeURL(displayName) +
             "&Password=" + WWW.EscapeURL(loginPassword) +
             "&Key=" + WWW.EscapeURL(key) +
             "&CurrentIP=" + WWW.EscapeURL(loginIP);
@@ -136,6 +141,36 @@ public class DBManager : MonoBehaviour
         }
 
         yield return null;
+    }
+
+    public IEnumerator SetPublicIP()
+    {
+        SettingIP = true;
+
+        WWW myExtIPWWW = new WWW("http://checkip.dyndns.org");
+
+        if(myExtIPWWW == null)
+        {
+
+            yield return null;
+        }
+
+        else
+        {
+            yield return myExtIPWWW;
+
+            string myExtIP = myExtIPWWW.text;
+
+            myExtIP = myExtIP.Substring(myExtIP.IndexOf(":")+1);
+
+            myExtIP = myExtIP.Substring(0,myExtIP.IndexOf("<"));
+            Debug.Log(myExtIP);
+            loginIP = myExtIP;
+            yield return null;
+        }
+
+        SettingIP = false;
+
     }
 
 
