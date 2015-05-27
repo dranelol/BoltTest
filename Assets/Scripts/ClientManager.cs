@@ -7,28 +7,48 @@ public class ClientManager : MonoBehaviour
 
     private string createAccountURL = "http://donionrings.me/Games/NetworkingDemo/CreateAccount.php?";
     private string loginURL = "http://donionrings.me/Games/NetworkingDemo/Login.php?";
+    private string getTokenInfoURL = "http://donionrings.me/Games/NetworkingDemo/GetTokenInfo.php?";
 
-    [SerializeField]
-    private int authLevel;
-
-    [SerializeField]
     private string loginName;
-
-    [SerializeField]
-    private string displayName;
-
-    [SerializeField]
     private string loginPassword;
 
-    public string loginIP;
+    private int authLevel;
 
-    private bool settingIP;
-
-    public bool SettingIP
+    public int AuthLevel
     {
         get
         {
-            return settingIP;
+            return authLevel;
+        }
+    }
+
+    private string displayName;
+
+    public string DisplayName
+    {
+        get
+        {
+            return displayName;
+        }
+    }
+
+    private string loginIP;
+
+    public string LoginIP
+    {
+        get
+        {
+            return loginIP;
+        }
+    }
+
+    private bool gettingLoginInfo;
+
+    public bool GettingLoginInfo
+    {
+        get
+        {
+            return gettingLoginInfo;
         }
     }
 
@@ -77,6 +97,8 @@ public class ClientManager : MonoBehaviour
 
     public IEnumerator AccountCreate()
     {
+        authLevel = 0;
+
         string getUrl = createAccountURL +
             "Name=" + WWW.EscapeURL(loginName) +
             "LoginName=" + WWW.EscapeURL(displayName) +
@@ -146,15 +168,15 @@ public class ClientManager : MonoBehaviour
         yield return null;
     }
 
-    public IEnumerator SetPublicIP()
+    public IEnumerator GetLoginInfo()
     {
-        settingIP = true;
+        gettingLoginInfo = true;
 
         WWW myExtIPWWW = new WWW("http://checkip.dyndns.org");
 
         if (myExtIPWWW == null)
         {
-
+            Debug.Log("there was an error accessing the public IP checker");
             yield return null;
         }
 
@@ -167,14 +189,50 @@ public class ClientManager : MonoBehaviour
             myExtIP = myExtIP.Substring(myExtIP.IndexOf(":") + 1);
 
             myExtIP = myExtIP.Substring(0, myExtIP.IndexOf("<"));
+
             Debug.Log(myExtIP);
             loginIP = myExtIP;
+
+            string getUrl = getTokenInfoURL +
+                "Name=" + WWW.EscapeURL(loginName) +
+                "&Key=" + WWW.EscapeURL(key);
+
+            WWW getTokenInfo = new WWW(getUrl);
+
+            yield return getTokenInfo;
+
+            if (getTokenInfo.error != null)
+            {
+                Debug.Log("There was an error getting info: " + getTokenInfo.error);
+            }
+
+            else
+            {
+                Debug.Log("Info successful!");
+                string tokenInfo = getTokenInfo.text;
+                string displayName = tokenInfo.Substring(0, tokenInfo.IndexOf("|"));
+                string authString = tokenInfo.Substring(tokenInfo.IndexOf("|"));
+
+                Debug.Log(displayName);
+                Debug.Log(authString);
+            }
+
+
             yield return null;
         }
 
-        settingIP = false;
+        gettingLoginInfo = false;
 
     }
 
+    public void SetUserPass(string user, string pass)
+    {
+        loginName = user;
+        loginPassword = pass;
+    }
 
+    public void SetDisplayName(string display)
+    {
+        displayName = display;
+    }
 }

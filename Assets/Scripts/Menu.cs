@@ -103,7 +103,7 @@ public class Menu : MonoBehaviour
             Debug.Log(inputUserName);
             Debug.Log(inputPassword);
 
-            StartCoroutine(ClientManager.Instance.SetPublicIP());
+            ClientManager.Instance.SetUserPass(inputUserName, inputPassword);
 
             state = State.LoggingIn;
         }
@@ -113,9 +113,11 @@ public class Menu : MonoBehaviour
 
     void LoggingIn()
     {
+        StartCoroutine(ClientManager.Instance.GetLoginInfo());
+
         GUILayout.BeginVertical(GUI.skin.box);
 
-        if (ClientManager.Instance.SettingIP == true)
+        if (ClientManager.Instance.GettingLoginInfo == true)
         {
             GUILayout.Label("Logging in...");
         }
@@ -130,7 +132,7 @@ public class Menu : MonoBehaviour
             token.DisplayName = "";
             token.LoginName = inputUserName;
             token.Password = inputPassword;
-            token.IP = ClientManager.Instance.loginIP;
+            token.IP = ClientManager.Instance.LoginIP;
 
             BoltNetwork.Connect(selectedSession, token);
         }
