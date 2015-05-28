@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Events;
 using System.Collections;
 
 public class ClientManager : MonoBehaviour 
@@ -13,6 +15,14 @@ public class ClientManager : MonoBehaviour
     private string loginPassword;
 
     private int authLevel;
+
+    public UnityEvent OnLoginSuccessful;
+
+    public UnityEvent OnLoginUnsuccessful;
+
+
+
+    //public UnityEvent<string, string> OnLoginSuccessful;
 
     public int AuthLevel
     {
@@ -84,15 +94,6 @@ public class ClientManager : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            StartCoroutine(AccountCreate());
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            StartCoroutine(Login());
-        }
     }
 
     public IEnumerator AccountCreate()
@@ -132,8 +133,16 @@ public class ClientManager : MonoBehaviour
         yield return null;
     }
 
-    public IEnumerator Login()
+    public void Login()
     {
+        Debug.Log(loginName);
+        Debug.Log(loginPassword);
+        StartCoroutine(login());
+    }
+
+    private IEnumerator login()
+    {
+        yield return StartCoroutine(GetLoginInfo());
 
         string getUrl = loginURL +
             "Name=" + WWW.EscapeURL(loginName) +
@@ -155,12 +164,14 @@ public class ClientManager : MonoBehaviour
         {
             if (login.text == "")
             {
-                Debug.Log("Login successful!");
+                //Debug.Log("Login successful!");
+                OnLoginSuccessful.Invoke();
             }
 
             else
             {
                 Debug.Log("An error occured!");
+                OnLoginUnsuccessful.Invoke();
                 Debug.Log(login.text);
             }
         }
@@ -210,11 +221,13 @@ public class ClientManager : MonoBehaviour
             {
                 Debug.Log("Info successful!");
                 string tokenInfo = getTokenInfo.text;
-                string displayName = tokenInfo.Substring(0, tokenInfo.IndexOf("|"));
-                string authString = tokenInfo.Substring(tokenInfo.IndexOf("|"));
+                displayName = tokenInfo.Substring(0, tokenInfo.IndexOf("|"));
+                authLevel = System.Convert.ToInt32(tokenInfo.Substring(tokenInfo.IndexOf("|")));
 
                 Debug.Log(displayName);
-                Debug.Log(authString);
+                Debug.Log(authLevel);
+
+
             }
 
 
@@ -225,14 +238,18 @@ public class ClientManager : MonoBehaviour
 
     }
 
-    public void SetUserPass(string user, string pass)
+    public void SetUser(InputField userText)
     {
-        loginName = user;
-        loginPassword = pass;
+        loginName = userText.text;
     }
 
-    public void SetDisplayName(string display)
+    public void SetPass(InputField passwordText)
     {
-        displayName = display;
+        loginPassword = passwordText.text;
+    }
+
+    public void SetDisplayName(Text displayNameText)
+    {
+        displayName = displayNameText.text;
     }
 }

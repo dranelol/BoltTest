@@ -103,7 +103,8 @@ public class Menu : MonoBehaviour
             Debug.Log(inputUserName);
             Debug.Log(inputPassword);
 
-            ClientManager.Instance.SetUserPass(inputUserName, inputPassword);
+            //ClientManager.Instance.SetUser(inputUserName);
+            //ClientManager.Instance.SetUser(inputPassword);
 
             state = State.LoggingIn;
         }

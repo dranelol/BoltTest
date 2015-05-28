@@ -67,20 +67,20 @@ public class PanelManager : MonoBehaviour
         if (m_Open == null)
             return;
         m_Open.SetBool(m_OpenParameterId, false);
-        StartCoroutine(DisablePanelDeleyed(m_Open));
+        StartCoroutine(DisablePanelDelayed(m_Open));
         m_Open = null;
     }
-    public void closeWindow(Animator anim)
+    public void CloseWindow(Animator anim)
     {
         if (!anim.gameObject.active)
         {
             return;
         }
         anim.SetBool(m_OpenParameterId, false);
-        StartCoroutine(DisablePanelDeleyed(anim));
+        StartCoroutine(DisablePanelDelayed(anim));
     }
 
-    public IEnumerator DisablePanelDeleyed(Animator anim)
+    public IEnumerator DisablePanelDelayed(Animator anim)
     {
         bool closedStateReached = false;
         bool wantToClose = true;
@@ -115,8 +115,13 @@ public class PanelManager : MonoBehaviour
 
     }
 
-    public void setSelected()
+    public void SetSelected()
     {
         EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    public void ASD(string test)
+    {
+
     }
 }
