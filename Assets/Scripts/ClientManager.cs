@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 public class ClientManager : MonoBehaviour 
 {
@@ -119,9 +120,13 @@ public class ClientManager : MonoBehaviour
         {
             authLevel = 0;
 
+            Debug.Log(loginName);
+            Debug.Log(displayName);
+            Debug.Log(loginPassword);
+
             string getUrl = createAccountURL +
                 "Name=" + WWW.EscapeURL(loginName) +
-                "LoginName=" + WWW.EscapeURL(displayName) +
+                "&DisplayName=" + WWW.EscapeURL(displayName) +
                 "&Password=" + WWW.EscapeURL(loginPassword) +
                 "&Key=" + WWW.EscapeURL(key) +
                 "&AuthLevel=" + authLevel;
@@ -167,11 +172,13 @@ public class ClientManager : MonoBehaviour
 
     private IEnumerator login()
     {
+        CoreGUIManager.Instance.SetNotificationText("Logging in...");
+        CoreGUIManager.Instance.Show("Notification");
+
         yield return StartCoroutine(GetLoginInfo());
 
         string getUrl = loginURL +
             "Name=" + WWW.EscapeURL(loginName) +
-            "LoginName=" + WWW.EscapeURL(displayName) +
             "&Password=" + WWW.EscapeURL(loginPassword) +
             "&Key=" + WWW.EscapeURL(key) +
             "&CurrentIP=" + WWW.EscapeURL(loginIP);
@@ -183,20 +190,26 @@ public class ClientManager : MonoBehaviour
         if (login.error != null)
         {
             Debug.Log("There was an error logging in: " + login.error);
+            CoreGUIManager.Instance.Hide("Notification");
+            CoreGUIManager.Instance.SetNotificationSubmitText("Error logging in: " + login.error);
+            CoreGUIManager.Instance.Show("NotificationSubmit");
         }
 
         else
         {
             if (login.text == "")
             {
-                //Debug.Log("Login successful!");
+                Debug.Log("Login successful!");
+                CoreGUIManager.Instance.Hide("Notification");
                 OnLoginSuccessful.Invoke();
             }
 
             else
             {
                 Debug.Log("An error occured!");
-                OnLoginUnsuccessful.Invoke();
+                CoreGUIManager.Instance.Hide("Notification");
+                CoreGUIManager.Instance.SetNotificationSubmitText("Error logging in: " + login.text);
+                CoreGUIManager.Instance.Show("NotificationSubmit");
                 Debug.Log(login.text);
             }
         }
@@ -208,7 +221,7 @@ public class ClientManager : MonoBehaviour
     {
         gettingLoginInfo = true;
 
-        WWW myExtIPWWW = new WWW("http://checkip.dyndns.org");
+        WWW myExtIPWWW = new WWW("https://api.ipify.org/");
 
         if (myExtIPWWW == null)
         {
@@ -220,40 +233,61 @@ public class ClientManager : MonoBehaviour
         else
         {
             yield return myExtIPWWW;
-
+            Debug.Log("return from www");
+            
             string myExtIP = myExtIPWWW.text;
 
-            myExtIP = myExtIP.Substring(myExtIP.IndexOf(":") + 1);
-
-            myExtIP = myExtIP.Substring(0, myExtIP.IndexOf("<"));
-
             Debug.Log(myExtIP);
-            loginIP = myExtIP;
 
-            string getUrl = getTokenInfoURL +
-                "Name=" + WWW.EscapeURL(loginName) +
-                "&Key=" + WWW.EscapeURL(key);
-
-            WWW getTokenInfo = new WWW(getUrl);
-
-            yield return getTokenInfo;
-
-            if (getTokenInfo.error != null)
+            if (myExtIP == "")
             {
-                Debug.Log("There was an error getting info: " + getTokenInfo.error);
+                Debug.Log("there was an error accessing the public IP checker");
+                OnPublicIPUnsuccessful.Invoke();
+                yield return null;
+
             }
 
             else
             {
-                Debug.Log("Info successful!");
-                string tokenInfo = getTokenInfo.text;
-                displayName = tokenInfo.Substring(0, tokenInfo.IndexOf("|"));
-                authLevel = System.Convert.ToInt32(tokenInfo.Substring(tokenInfo.IndexOf("|")));
 
-                Debug.Log(displayName);
-                Debug.Log(authLevel);
+                Debug.Log(myExtIP);
+                loginIP = myExtIP;
 
 
+                string getUrl = getTokenInfoURL +
+                    "Name=" + WWW.EscapeURL(loginName) +
+                    "&Key=" + WWW.EscapeURL(key);
+
+                WWW getTokenInfo = new WWW(getUrl);
+
+                yield return getTokenInfo;
+
+                if (getTokenInfo.error != null)
+                {
+                    Debug.Log("There was an error getting info: " + getTokenInfo.error);
+                }
+
+                else
+                {
+                    string tokenInfo = getTokenInfo.text;
+                    Debug.Log(tokenInfo);
+                    if (tokenInfo != "")
+                    {
+                        Debug.Log("Info successful!");
+
+                        displayName = tokenInfo.Substring(0, tokenInfo.IndexOf("|"));
+                        string authLevelString = tokenInfo.Substring(tokenInfo.IndexOf("|") + 1);
+                        authLevel = System.Convert.ToInt32(authLevelString);
+                        Debug.Log(authLevelString);
+                        Debug.Log(displayName);
+
+                    }
+
+                    else
+                    {
+                        Debug.Log("Info unsuccessful!");
+                    }
+                }
             }
 
 

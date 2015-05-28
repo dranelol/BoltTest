@@ -83,6 +83,7 @@ public class CoreGUIManager : GUIManager, IGUIBehavior
     {
         if(Input.GetKeyDown(KeyCode.Alpha1))
         {
+            Debug.Log(Network.player.externalIP.ToString());
             Show("Login_Menu");
         }
     }
