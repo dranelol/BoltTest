@@ -20,6 +20,12 @@ public class ClientManager : MonoBehaviour
 
     public UnityEvent OnLoginUnsuccessful;
 
+    public UnityEvent OnAccountCreateSuccessful;
+
+    public UnityEvent OnAccountCreateUnsuccessful;
+
+    public UnityEvent OnPublicIPUnsuccessful;
+
 
 
     //public UnityEvent<string, string> OnLoginSuccessful;
@@ -96,37 +102,56 @@ public class ClientManager : MonoBehaviour
     {
     }
 
-    public IEnumerator AccountCreate()
+    public void CreateAccount()
     {
-        authLevel = 0;
+        StartCoroutine(createAccount());
+    }
 
-        string getUrl = createAccountURL +
-            "Name=" + WWW.EscapeURL(loginName) +
-            "LoginName=" + WWW.EscapeURL(displayName) +
-            "&Password=" + WWW.EscapeURL(loginPassword) +
-            "&Key=" + WWW.EscapeURL(key) +
-            "&AuthLevel=" + authLevel;
-
-        WWW createAccount = new WWW(getUrl);
-
-        yield return createAccount;
-
-        if (createAccount.error != null)
+    private IEnumerator createAccount()
+    {
+        if (displayName == "" || loginName == "" || loginPassword == "")
         {
-            Debug.Log("There was an error creating the account: " + createAccount.error);
+            CoreGUIManager.Instance.SetNotificationSubmitText("All fields not filled out!");
+            CoreGUIManager.Instance.Show("NotificationSubmit");
         }
 
         else
         {
-            if (createAccount.text == "")
+            authLevel = 0;
+
+            string getUrl = createAccountURL +
+                "Name=" + WWW.EscapeURL(loginName) +
+                "LoginName=" + WWW.EscapeURL(displayName) +
+                "&Password=" + WWW.EscapeURL(loginPassword) +
+                "&Key=" + WWW.EscapeURL(key) +
+                "&AuthLevel=" + authLevel;
+
+            WWW createAccount = new WWW(getUrl);
+
+            yield return createAccount;
+
+            if (createAccount.error != null)
             {
-                Debug.Log("account created successfully!");
+                Debug.Log("There was an error creating the account: " + createAccount.error);
+                CoreGUIManager.Instance.SetNotificationSubmitText("Error creating account: " + createAccount.error);
+                CoreGUIManager.Instance.Show("NotificationSubmit");
             }
 
             else
             {
-                Debug.Log("An error occured!");
-                Debug.Log(createAccount.text);
+                if (createAccount.text == "")
+                {
+                    Debug.Log("account created successfully!");
+                    OnAccountCreateSuccessful.Invoke();
+                }
+
+                else
+                {
+                    Debug.Log("An error occured!");
+                    Debug.Log(createAccount.text);
+                    CoreGUIManager.Instance.SetNotificationSubmitText("Error creating account: " + createAccount.text);
+                    CoreGUIManager.Instance.Show("NotificationSubmit");
+                }
             }
         }
 
@@ -188,6 +213,7 @@ public class ClientManager : MonoBehaviour
         if (myExtIPWWW == null)
         {
             Debug.Log("there was an error accessing the public IP checker");
+            OnPublicIPUnsuccessful.Invoke();
             yield return null;
         }
 
@@ -238,6 +264,40 @@ public class ClientManager : MonoBehaviour
 
     }
 
+    public void GetPublicIP()
+    {
+        StartCoroutine(getPublicIP());
+    }
+
+    private IEnumerator getPublicIP()
+    {
+        loginIP = "";
+        WWW myExtIPWWW = new WWW("http://checkip.dyndns.org");
+
+        if (myExtIPWWW == null)
+        {
+            Debug.Log("there was an error accessing the public IP checker");
+            OnPublicIPUnsuccessful.Invoke();
+            yield return null;
+        }
+
+        else
+        {
+            yield return myExtIPWWW;
+
+            string myExtIP = myExtIPWWW.text;
+
+            myExtIP = myExtIP.Substring(myExtIP.IndexOf(":") + 1);
+
+            myExtIP = myExtIP.Substring(0, myExtIP.IndexOf("<"));
+
+            Debug.Log(myExtIP);
+            loginIP = myExtIP;
+        }
+
+        yield return null;
+    }
+
     public void SetUser(InputField userText)
     {
         loginName = userText.text;
@@ -248,7 +308,7 @@ public class ClientManager : MonoBehaviour
         loginPassword = passwordText.text;
     }
 
-    public void SetDisplayName(Text displayNameText)
+    public void SetDisplayName(InputField displayNameText)
     {
         displayName = displayNameText.text;
     }

@@ -23,6 +23,14 @@ public class CheckPasswords : MonoBehaviour
 
     public void CheckPassword()
     {
+        if(passwordOne == "" || passwordTwo == "")
+        {
+            CoreGUIManager.Instance.SetNotificationSubmitText("One or both password fields not filled out!");
+            CoreGUIManager.Instance.Show("NotificationSubmit");
+
+            return;
+        }
+
         if(passwordOne == passwordTwo)
         {
             OnPasswordMatch.Invoke();

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,6 +25,12 @@ public class CoreGUIManager : GUIManager, IGUIBehavior
     }
 
     public MenuState CurrentState;
+
+    [SerializeField]
+    private Text notificationText;
+
+    [SerializeField]
+    private Text notificationSubmitText;
 
     const string k_OpenTransitionName = "Open";
     const string k_ClosedStateName = "Closed";
@@ -79,7 +86,6 @@ public class CoreGUIManager : GUIManager, IGUIBehavior
             Show("Login_Menu");
         }
     }
-    
 
     public void Pause(bool showMenu)
     {
@@ -205,6 +211,19 @@ public class CoreGUIManager : GUIManager, IGUIBehavior
             es.enabled = true;
         }
     }
+
+    public void SetNotificationText(string text)
+    {
+        notificationText.text = text;
+    }
+
+    public void SetNotificationSubmitText(string text)
+    {
+        notificationSubmitText.text = text;
+    }
+
+    
+
 
     #region MENU PANEL ACTIONS
     public void OpenPanel(Animator anim)
