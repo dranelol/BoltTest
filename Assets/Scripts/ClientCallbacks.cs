@@ -3,14 +3,14 @@ using System.Collections;
 using Bolt;
 
 
-[BoltGlobalBehaviour(BoltNetworkModes.Server)]
-public class ServerCallbacks : GlobalEventListener
+[BoltGlobalBehaviour(BoltNetworkModes.Client)]
+public class ClientCallbacks : GlobalEventListener
 {
     public override void Connected(BoltConnection connection, IProtocolToken acceptToken, IProtocolToken connectToken)
     {
         var log = LogEvent.Create();
         //log.Message = string.Format("{0} connected", connection.RemoteEndPoint);
-        
+
 
         // connected to server
         CredentialToken token = (CredentialToken)connectToken;
@@ -22,10 +22,8 @@ public class ServerCallbacks : GlobalEventListener
 
         // if not added to server's lobby, add to lobby
 
-        // this will broadcast server-side only
+        // this will broadcast client-side only
         Messenger.Broadcast("UserAddedToLobby", token);
-
-        // tell all clients that a new user is joining the lobby so that they may update their GUIs and such
 
     }
 
@@ -42,7 +40,7 @@ public class ServerCallbacks : GlobalEventListener
 
         CredentialToken disconnectToken = ServerManager.Instance.GetConnectedTokenByIP(connection.RemoteEndPoint.Address.ToString());
 
-        // this will broadcast server-side only
+        // this will broadcast client-side only
         Messenger.Broadcast("UserRemovedFromLobby", disconnectToken);
 
         // tell all clients that a user is leaving the lobby so that they may update their GUIs and such

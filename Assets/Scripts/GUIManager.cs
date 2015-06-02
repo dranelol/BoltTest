@@ -184,6 +184,7 @@ public class GUIManager : MonoBehaviour, IGUIBehavior
 
     protected virtual void OnEnable()
     {
+        Debug.Log("enabling guimanager: " + gameObject.name);
         if (!init)
         {
             if (debug)

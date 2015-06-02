@@ -27,7 +27,12 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
         Lobby
     }
 
+    [SerializeField]
+    private Text ServerLobbyText;
+
     public PanelState CurrentPanelState;
+
+    public HashSet<GameObject> LobbyMembers = new HashSet<GameObject>();
 
     private static StartMenuGUIManager _instance;
 
@@ -60,8 +65,8 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
 
         base.Awake();
 
-        Messenger.AddListener("UserAddedToLobby", UpdateLobby);
-        Messenger.AddListener("UserRemovedFromLobby", UpdateLobby);
+        Messenger.AddListener<CredentialToken>("UserAddedToLobby", AddToLobby);
+        Messenger.AddListener<CredentialToken>("UserRemovedFromLobby", RemoveFromLobby);
     }
 
     protected override void OnEnable()
@@ -91,7 +96,12 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
         }
     }
 
-    public void UpdateLobby()
+    public void AddToLobby(CredentialToken user)
+    {
+
+    }
+
+    public void RemoveFromLobby(CredentialToken user)
     {
 
     }

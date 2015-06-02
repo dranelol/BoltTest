@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ServerManager: MonoBehaviour
 {
     private static ServerManager _instance;
 
-    private HashSet<CredentialToken> connectedUsers = new HashSet<CredentialToken>();
+    private List<CredentialToken> connectedUsers = new List<CredentialToken>();
 
-    public HashSet<CredentialToken> ConnectedUsers
+    public List<CredentialToken> ConnectedUsers
     {
         get
         {
@@ -30,7 +31,11 @@ public class ServerManager: MonoBehaviour
         }
 
         Messenger.AddListener<CredentialToken>("UserAddedToLobby", AddToLobby);
-        Messenger.AddListener<CredentialToken>("UserRemovedFromLobby", AddToLobby);
+        
+        Messenger.AddListener<CredentialToken>("UserRemovedFromLobby", RemoveFromLobby);
+
+        Messenger.MakePermanent("UserAddedToLobby");
+        Messenger.MakePermanent("UserRemovedFromLobby");
     }
 
     public static ServerManager Instance
@@ -53,6 +58,8 @@ public class ServerManager: MonoBehaviour
         {
             connectedUsers.Add(user);
         }
+
+        Messenger.Broadcast("UpdateLobby");
     }
     public void RemoveFromLobby(CredentialToken user)
     {
@@ -60,6 +67,22 @@ public class ServerManager: MonoBehaviour
         {
             connectedUsers.Remove(user);
         }
+
+        Messenger.Broadcast("UpdateLobby");
+    }
+
+    public bool CheckUsedDisplayName(string name)
+    {
+        return true;
+    }
+
+    public CredentialToken GetConnectedTokenByIP(string IP)
+    {
+        CredentialToken token = new CredentialToken();
+
+        token = connectedUsers.Find(x => x.IP == IP);
+
+        return token;
     }
 
 }

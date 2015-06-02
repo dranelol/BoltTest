@@ -45,10 +45,12 @@ public class PopulateServerBrowser : MonoBehaviour
             server.transform.GetChild(0).GetComponent<Text>().text = session.Value.HostName + " " + session.Value.WanEndPoint;
 
             server.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(Connect);
+
+            server.transform.GetChild(1).GetComponent<ServerButtonSessionInfo>().SelectedSession = session.Value;
         }
     }
 
-    void Connect()
+    public void Connect()
     {
         // get credential token from clientmanager
         CredentialToken token = ClientManager.Instance.GetToken();
@@ -59,5 +61,14 @@ public class PopulateServerBrowser : MonoBehaviour
         Debug.Log(token.IP);
         Debug.Log(token.AuthLevel);
         // connect to selected server
+
+        // connect client here??????
+        BoltLauncher.StartClient();
+
+        UdpKit.UdpSession selectedSession = GetComponent<ServerButtonSessionInfo>().SelectedSession;
+
+        BoltNetwork.Connect(selectedSession, token);
+
+        StartMenuGUIManager.Instance.Show("ServerLobby");
     }
 }
