@@ -15,8 +15,13 @@ public class ServerCallbacks : GlobalEventListener
         // connected to server
         CredentialToken token = (CredentialToken)connectToken;
 
-        log.Message += "connected: " + token.LoginName + " " + token.Password + " " + token.IP;
+        log.Message += "connected: " + token.LoginName;
         log.Send();
+
+        Debug.Log("token connected: " + token.LoginName);
+
+        // if not added to server's lobby, add to lobby
+        Messenger.Broadcast("UserAddedToLobby", token);
 
     }
 
@@ -25,5 +30,13 @@ public class ServerCallbacks : GlobalEventListener
         var log = LogEvent.Create();
         log.Message = string.Format("{0} disconnected", connection.RemoteEndPoint);
         log.Send();
+
+        CredentialToken currentToken = ClientManager.Instance.GetToken();
+
+        Debug.Log("token disconnected: " + currentToken.LoginName);
+
+        Messenger.Broadcast("UserRemovedFromLobby", currentToken);
+
+        // if added to server's lobby, remove from lobby
     }
 }

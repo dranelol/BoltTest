@@ -83,6 +83,8 @@ public class ClientManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+        
     }
 
     public static ClientManager Instance
@@ -345,5 +347,18 @@ public class ClientManager : MonoBehaviour
     public void SetDisplayName(InputField displayNameText)
     {
         displayName = displayNameText.text;
+    }
+
+    public CredentialToken GetToken()
+    {
+        CredentialToken token = new CredentialToken();
+        
+        token.AuthLevel = authLevel;
+        token.DisplayName = displayName;
+        token.LoginName = loginName;
+        token.IP = loginIP;
+        token.Password = loginPassword;
+        
+        return token;
     }
 }

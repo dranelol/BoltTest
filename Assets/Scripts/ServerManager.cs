@@ -6,6 +6,16 @@ public class ServerManager: MonoBehaviour
 {
     private static ServerManager _instance;
 
+    private HashSet<CredentialToken> connectedUsers = new HashSet<CredentialToken>();
+
+    public HashSet<CredentialToken> ConnectedUsers
+    {
+        get
+        {
+            return connectedUsers;
+        }
+    }
+
     private void Awake()
     {
         if (_instance == null)
@@ -18,6 +28,9 @@ public class ServerManager: MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+        Messenger.AddListener<CredentialToken>("UserAddedToLobby", AddToLobby);
+        Messenger.AddListener<CredentialToken>("UserRemovedFromLobby", AddToLobby);
     }
 
     public static ServerManager Instance
@@ -31,6 +44,21 @@ public class ServerManager: MonoBehaviour
             }
 
             return _instance;
+        }
+    }
+
+    public void AddToLobby(CredentialToken user)
+    {
+        if(connectedUsers.Contains(user) == false)
+        {
+            connectedUsers.Add(user);
+        }
+    }
+    public void RemoveFromLobby(CredentialToken user)
+    {
+        if (connectedUsers.Contains(user) == true)
+        {
+            connectedUsers.Remove(user);
         }
     }
 

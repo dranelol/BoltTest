@@ -29,7 +29,7 @@ public class Menu : MonoBehaviour
     {
         if (GUILayout.Button("Start Server", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
         {
-            Instantiate(GameManager.Instance.ServerManagerGO);
+            Instantiate(GameManager.Instance.ServerManagerPrefab);
             //BoltLauncher.StartServer(UdpKit.UdpEndPoint.Parse("127.0.0.1:27000"));
             BoltLauncher.StartServer(UdpKit.UdpEndPoint.Any);
 
@@ -39,7 +39,7 @@ public class Menu : MonoBehaviour
 
         if (GUILayout.Button("Start Client", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
         {
-            Instantiate(GameManager.Instance.ClientManagerGO);
+            //Instantiate(GameManager.Instance.ClientManagerPrefab);
             BoltLauncher.StartClient();
             state = State.ServerBrowser;
         }

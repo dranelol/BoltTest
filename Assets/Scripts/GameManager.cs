@@ -3,8 +3,8 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour 
 {
-    public GameObject ServerManagerGO;
-    public GameObject ClientManagerGO;
+    public GameObject ServerManagerPrefab;
+    public GameObject ClientManagerPrefab;
 
     private static GameManager _instance;
 
@@ -34,6 +34,28 @@ public class GameManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Debug.Log(Network.player.externalIP.ToString());
+            StartMenuGUIManager.Instance.Show("Login_Menu");
+        }
+    }
+
+    public void StartServer()
+    {
+        Instantiate(GameManager.Instance.ServerManagerPrefab);
+        //BoltLauncher.StartServer(UdpKit.UdpEndPoint.Parse("127.0.0.1:27000"));
+        BoltLauncher.StartServer(UdpKit.UdpEndPoint.Any);
+
+        BoltNetwork.SetHostInfo("Here You Go", null);
+        //BoltNetwork.LoadScene("Tutorial1");
+
+        // go to lobby
+        CoreGUIManager.Instance.Show("GameLobby");
     }
 
     

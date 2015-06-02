@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using UnityEditor;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,10 +11,38 @@ public class GUIManager : MonoBehaviour, IGUIBehavior
     private List<GameObject> registered = new List<GameObject>();
 
     protected Dictionary<string, GameObject> elements = new Dictionary<string, GameObject>();
+    protected Dictionary<string, GameObject> panels = new Dictionary<string, GameObject>();
     protected bool debug;
     protected bool init;
 
-    public void Show(string item)
+    const string OpenTransitionName = "Open";
+    const string ClosedStateName = "Closed";
+    private int OpenParameterId;
+    public GameObject GameWindow;
+    public GameObject VideoWindow;
+    public GameObject AudioWindow;
+    private Animator Open;
+    private GameObject PreviouslySelected;
+
+    [ContextMenu("Enable All Children")]
+    public void EnableAll()
+    {
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(true);
+        }
+    }
+
+    [ContextMenu("Disable All Children")]
+    public void DisableAll()
+    {
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+    }
+
+    public virtual void Show(string item)
     {
         //Debug.Log("show " + item);
 
@@ -22,14 +52,14 @@ public class GUIManager : MonoBehaviour, IGUIBehavior
 
             elements[item].SetActive(true);
 
-            
-
+            // if this derived type is the start menu manager
             Animator anim = elements[item].GetComponent<Animator>();
             if(anim != null)
             {
-                CoreGUIManager.Instance.OpenPanel(anim);
+                OpenPanel(anim);
             }
         }
+
         else
         {
             Debug.Log("could not show " + item);
@@ -162,7 +192,7 @@ public class GUIManager : MonoBehaviour, IGUIBehavior
             }
 
             init = true;
-
+            OpenParameterId = Animator.StringToHash(OpenTransitionName);
             HideAll();
         }
 
@@ -173,6 +203,8 @@ public class GUIManager : MonoBehaviour, IGUIBehavior
                 Debug.Log(name + " already init :: first OnEnable triggered");
             }
         }
+
+
 
     }
 
@@ -198,5 +230,176 @@ public class GUIManager : MonoBehaviour, IGUIBehavior
 
     }
 
+    #region MENU PANEL ACTIONS
+    public void OpenPanel(Animator anim)
+    {
+        if (Open == anim)
+            return;
+        anim.gameObject.SetActive(true);
+        var newPreviouslySelected = EventSystem.current.currentSelectedGameObject;
+
+        //anim.transform.SetAsLastSibling();
+
+        CloseCurrent();
+
+        PreviouslySelected = newPreviouslySelected;
+
+        Open = anim;
+        Open.SetBool(OpenParameterId, true);
+    }
+
+    public void OpenPanelWithoutClose(Animator anim)
+    {
+        if (Open == anim)
+            return;
+        anim.gameObject.SetActive(true);
+        var newPreviouslySelected = EventSystem.current.currentSelectedGameObject;
+
+        //anim.transform.SetAsLastSibling();
+
+        PreviouslySelected = newPreviouslySelected;
+
+        anim.SetBool(OpenParameterId, true);
+    }
+
+    public void CloseCurrent()
+    {
+        if (Open == null)
+            return;
+        Open.SetBool(OpenParameterId, false);
+        StartCoroutine(DisablePanelDelayed(Open));
+        Open = null;
+    }
     
+    public void CloseWindow(Animator anim)
+    {
+        if (!anim.gameObject.active)
+        {
+            return;
+        }
+        anim.SetBool(OpenParameterId, false);
+        StartCoroutine(DisablePanelDelayed(anim));
+    }
+
+    public IEnumerator DisablePanelDelayed(Animator anim)
+    {
+        bool closedStateReached = false;
+        bool wantToClose = true;
+        while (!closedStateReached && wantToClose)
+        {
+            if (!anim.IsInTransition(0))
+                closedStateReached = anim.GetCurrentAnimatorStateInfo(0).IsName(ClosedStateName);
+
+            wantToClose = !anim.GetBool(OpenParameterId);
+
+            yield return new WaitForEndOfFrame();
+        }
+        if (wantToClose)
+        {
+            if (anim.gameObject.tag == "Settings")
+            {
+                if (GameWindow.activeSelf)
+                {
+                    GameWindow.SetActive(false);
+                }
+                else if (GameWindow.activeSelf)
+                {
+                    VideoWindow.SetActive(false);
+                }
+                else if (GameWindow.activeSelf)
+                {
+                    AudioWindow.SetActive(false);
+                }
+            }
+            anim.gameObject.SetActive(false);
+        }
+
+        Hide(anim.gameObject.name);
+
+    }
+
+    public void SetSelected()
+    {
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    #endregion
+
+    #region ENABLE/DISABLE INTERACTION 
+    // Keep a list of pointer input modules that we have disabled so that we can re-enable them
+    List<PointerInputModule> disabled = new List<PointerInputModule>();
+
+    int disableCount = 0;    // How many times has disable been called?
+
+    public void Disable()
+    {
+        if (disableCount++ == 0)
+        {
+            UpdateState(false);
+        }
+    }
+
+    public void Enable(bool enable)
+    {
+        if (!enable)
+        {
+            Disable();
+            return;
+        }
+        if (--disableCount == 0)
+        {
+            UpdateState(true);
+            if (disableCount > 0)
+            {
+                Debug.LogWarning("Warning UIDisableInput.Enable called more than Disable");
+            }
+        }
+    }
+
+
+    void UpdateState(bool enabled)
+    {
+        // First re-enable all systems
+        for (int i = 0; i < disabled.Count; i++)
+        {
+            if (disabled[i])
+            {
+                disabled[i].enabled = true;
+            }
+        }
+
+        disabled.Clear();
+
+        EventSystem es = EventSystem.current;
+
+        if (es == null) return;
+
+        es.sendNavigationEvents = enabled;
+
+        if (!enabled)
+        {
+            // Find all PointerInputModules and disable them
+            PointerInputModule[] pointerInput = es.GetComponents<PointerInputModule>();
+            if (pointerInput != null)
+            {
+                for (int i = 0; i < pointerInput.Length; i++)
+                {
+                    PointerInputModule pim = pointerInput[i];
+                    if (pim.enabled)
+                    {
+                        pim.enabled = false;
+                        // Keep a list of disabled ones
+                        disabled.Add(pim);
+                    }
+                }
+            }
+
+            // Cause EventSystem to update it's list of modules
+            es.enabled = false;
+            es.enabled = true;
+        }
+    }
+    #endregion
+
+
 }
