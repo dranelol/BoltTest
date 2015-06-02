@@ -55,7 +55,9 @@ public class GameManager : MonoBehaviour
         //BoltNetwork.LoadScene("Tutorial1");
 
         // go to lobby
-        CoreGUIManager.Instance.Show("GameLobby");
+        StartMenuGUIManager.Instance.SetServerLobbyTitle("Server Lobby: Here You Go");
+        StartMenuGUIManager.Instance.Show("ServerLobby");
+        
     }
 
     

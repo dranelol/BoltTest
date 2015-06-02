@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;

@@ -1,7 +1,12 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
-public class uGUITools : MonoBehaviour {
+public class uGUITools : MonoBehaviour 
+{
+
+#if UNITY_EDITOR
 	[MenuItem("uGUI/Anchors to Corners %[")]
 	static void AnchorsToCorners(){
 		foreach(Transform transform in Selection.transforms){
@@ -42,6 +47,18 @@ public class uGUITools : MonoBehaviour {
 		MirrorHorizontally(true);
 	}
 
+    [MenuItem("uGUI/Mirror Vertically Around Anchors %'")]
+	static void MirrorVerticallyAnchors(){
+		MirrorVertically(false);
+	}
+	
+	[MenuItem("uGUI/Mirror Vertically Around Parent Center %\"")]
+	static void MirrorVerticallyParent(){
+		MirrorVertically(true);
+	}
+
+
+
 	static void MirrorHorizontally(bool mirrorAnchors){
 		foreach(Transform transform in Selection.transforms){
 			RectTransform t = transform as RectTransform;
@@ -63,15 +80,7 @@ public class uGUITools : MonoBehaviour {
 		}
 	}
 
-	[MenuItem("uGUI/Mirror Vertically Around Anchors %'")]
-	static void MirrorVerticallyAnchors(){
-		MirrorVertically(false);
-	}
 	
-	[MenuItem("uGUI/Mirror Vertically Around Parent Center %\"")]
-	static void MirrorVerticallyParent(){
-		MirrorVertically(true);
-	}
 	
 	static void MirrorVertically(bool mirrorAnchors){
 		foreach(Transform transform in Selection.transforms){
@@ -92,5 +101,6 @@ public class uGUITools : MonoBehaviour {
 			
 			t.localScale = new Vector3(t.localScale.x, -t.localScale.y, t.localScale.z);
 		}
-	}
+    }
+#endif
 }

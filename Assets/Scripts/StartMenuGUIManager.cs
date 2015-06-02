@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
@@ -29,6 +28,9 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
 
     [SerializeField]
     private Text ServerLobbyText;
+
+    [SerializeField]
+    private GameObject serverBrowser;
 
     public PanelState CurrentPanelState;
 
@@ -83,6 +85,12 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
     {
 
         base.Show(item);
+
+        if(item == "ServerBrowser")
+        {
+            BoltLauncher.StartClient();
+            serverBrowser.GetComponent<PopulateServerBrowser>().Populate();
+        }
     }
 
     public void SetActiveButton(string name)
@@ -104,6 +112,11 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
     public void RemoveFromLobby(CredentialToken user)
     {
 
+    }
+
+    public void SetServerLobbyTitle(string text)
+    {
+        ServerLobbyText.text = text;
     }
     
 }

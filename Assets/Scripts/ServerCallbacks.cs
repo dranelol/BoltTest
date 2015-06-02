@@ -32,7 +32,7 @@ public class ServerCallbacks : GlobalEventListener
     public override void Disconnected(BoltConnection connection, IProtocolToken token)
     {
         var log = LogEvent.Create();
-        log.Message = string.Format("{0} disconnected", connection.RemoteEndPoint);
+        log.Message = string.Format("{0} disconnected", connection.RemoteEndPoint.Address.ToString());
         log.Send();
 
         Debug.Log("token disconnected: " + connection.RemoteEndPoint.Address.ToString());

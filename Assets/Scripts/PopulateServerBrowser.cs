@@ -14,6 +14,11 @@ public class PopulateServerBrowser : MonoBehaviour
 
     public void Populate()
     {
+        foreach (Transform child in ServerList.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
         foreach (var session in BoltNetwork.SessionList)
         {
             /*
@@ -44,6 +49,8 @@ public class PopulateServerBrowser : MonoBehaviour
 
             server.transform.GetChild(0).GetComponent<Text>().text = session.Value.HostName + " " + session.Value.WanEndPoint;
 
+            Debug.Log("adding server to list: " + session.Value.HostName + " " + session.Value.WanEndPoint);
+
             server.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(Connect);
 
             server.transform.GetChild(1).GetComponent<ServerButtonSessionInfo>().SelectedSession = session.Value;
@@ -63,12 +70,14 @@ public class PopulateServerBrowser : MonoBehaviour
         // connect to selected server
 
         // connect client here??????
-        BoltLauncher.StartClient();
+        
 
         UdpKit.UdpSession selectedSession = GetComponent<ServerButtonSessionInfo>().SelectedSession;
+        
 
         BoltNetwork.Connect(selectedSession, token);
 
+        StartMenuGUIManager.Instance.SetServerLobbyTitle("Server Lobby: " + selectedSession.HostName);
         StartMenuGUIManager.Instance.Show("ServerLobby");
     }
 }
