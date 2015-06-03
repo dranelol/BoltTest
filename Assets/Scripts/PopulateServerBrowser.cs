@@ -47,7 +47,16 @@ public class PopulateServerBrowser : MonoBehaviour
 
             server.transform.parent = ServerList.transform;
 
-            server.transform.GetChild(0).GetComponent<Text>().text = session.Value.HostName + " " + session.Value.WanEndPoint;
+            server.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+
+            Vector3 position = server.GetComponent<RectTransform>().anchoredPosition3D;
+
+            position.z = 0.0f;
+
+            server.GetComponent<RectTransform>().anchoredPosition3D = position;
+           
+
+            server.transform.GetChild(0).GetComponent<Text>().text = session.Value.HostName + " " + session.Value.WanEndPoint.Address;
 
             Debug.Log("adding server to list: " + session.Value.HostName + " " + session.Value.WanEndPoint);
 
