@@ -60,33 +60,13 @@ public class PopulateServerBrowser : MonoBehaviour
 
             Debug.Log("adding server to list: " + session.Value.HostName + " " + session.Value.WanEndPoint);
 
-            server.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(Connect);
+            ServerButtonSessionInfo sessionInfo = server.transform.GetChild(1).GetComponent<ServerButtonSessionInfo>();
 
-            server.transform.GetChild(1).GetComponent<ServerButtonSessionInfo>().SelectedSession = session.Value;
+            sessionInfo.SelectedSession = session.Value;
+
+            server.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(sessionInfo.Connect);
         }
     }
 
-    public void Connect()
-    {
-        // get credential token from clientmanager
-        CredentialToken token = ClientManager.Instance.GetToken();
-        Debug.Log("connecting with token: ");
-        Debug.Log(token.LoginName);
-        Debug.Log(token.DisplayName);
-        Debug.Log(token.Password);
-        Debug.Log(token.IP);
-        Debug.Log(token.AuthLevel);
-        // connect to selected server
-
-        // connect client here??????
-        
-
-        UdpKit.UdpSession selectedSession = GetComponent<ServerButtonSessionInfo>().SelectedSession;
-        
-
-        BoltNetwork.Connect(selectedSession, token);
-
-        StartMenuGUIManager.Instance.SetServerLobbyTitle("Server Lobby: " + selectedSession.HostName);
-        StartMenuGUIManager.Instance.Show("ServerLobby");
-    }
+    
 }
