@@ -32,9 +32,16 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
     [SerializeField]
     private GameObject serverBrowser;
 
+    [SerializeField]
+    private GameObject userPrefab;
+
+    [SerializeField]
+    private GameObject lobbyUsers;
+
     public PanelState CurrentPanelState;
 
-    public HashSet<GameObject> LobbyMembers = new HashSet<GameObject>();
+    // map display name to GUI object
+    public Dictionary<string, GameObject> lobbyMembers = new Dictionary<string, GameObject>();
 
     private static StartMenuGUIManager _instance;
 
@@ -67,8 +74,8 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
 
         base.Awake();
 
-        Messenger.AddListener<CredentialToken>("UserAddedToLobby", AddToLobby);
-        Messenger.AddListener<CredentialToken>("UserRemovedFromLobby", RemoveFromLobby);
+        Messenger.AddListener<string>("UserAddedToLobby", AddToLobby);
+        Messenger.AddListener<string>("UserRemovedFromLobby", RemoveFromLobby);
     }
 
     protected override void OnEnable()
@@ -104,14 +111,38 @@ public class StartMenuGUIManager : GUIManager, IGUIBehavior
         }
     }
 
-    public void AddToLobby(CredentialToken user)
+    public void AddToLobby(string userDisplayName)
     {
+        if (lobbyMembers.ContainsKey(userDisplayName) == false)
+        {
+            // instatiate "user" gui prefab
 
+            GameObject user = (GameObject)Instantiate(userPrefab, Vector3.zero, Quaternion.identity);
+
+            user.transform.parent = lobbyUsers.transform;
+            user.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            Vector3 position = user.GetComponent<RectTransform>().anchoredPosition3D;
+
+            position.z = 0.0f;
+
+            user.GetComponent<RectTransform>().anchoredPosition3D = position;
+
+            user.transform.GetChild(0).GetComponent<Text>().text = userDisplayName;
+
+            lobbyMembers[userDisplayName] = user;
+
+            
+
+
+        }
     }
 
-    public void RemoveFromLobby(CredentialToken user)
+    public void RemoveFromLobby(string userDisplayName)
     {
-
+        if(lobbyMembers.ContainsKey(userDisplayName))
+        {
+            Destroy(lobbyMembers[userDisplayName]);
+        }
     }
 
     public void SetServerLobbyTitle(string text)

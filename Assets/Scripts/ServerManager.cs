@@ -30,12 +30,12 @@ public class ServerManager: MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        Messenger.AddListener<CredentialToken>("UserAddedToLobby", AddToLobby);
+        Messenger.AddListener<CredentialToken>("UserAddedServer", AddToLobby);
         
-        Messenger.AddListener<CredentialToken>("UserRemovedFromLobby", RemoveFromLobby);
+        Messenger.AddListener<CredentialToken>("UserRemovedServer", RemoveFromLobby);
 
-        Messenger.MakePermanent("UserAddedToLobby");
-        Messenger.MakePermanent("UserRemovedFromLobby");
+        Messenger.MakePermanent("UserAddedServer");
+        Messenger.MakePermanent("UserRemovedServer");
     }
 
     public static ServerManager Instance
@@ -59,7 +59,7 @@ public class ServerManager: MonoBehaviour
             connectedUsers.Add(user);
         }
 
-        Messenger.Broadcast("UpdateLobby");
+        //Messenger.Broadcast("UpdateLobby");
     }
     public void RemoveFromLobby(CredentialToken user)
     {
@@ -68,7 +68,7 @@ public class ServerManager: MonoBehaviour
             connectedUsers.Remove(user);
         }
 
-        Messenger.Broadcast("UpdateLobby");
+        //Messenger.Broadcast("UpdateLobby");
     }
 
     public bool CheckUsedDisplayName(string name)

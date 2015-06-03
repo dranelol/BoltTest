@@ -33,6 +33,18 @@ public class NetworkCallbacks : Bolt.GlobalEventListener
         logMessages.Insert(0, evnt.Message);
     }
 
+    public override void OnEvent(UserJoinedLobby evnt)
+    {
+        Messenger.Broadcast("UserAddedToLobby", evnt.UserDisplayName);
+    }
+
+    public override void OnEvent(UserDisconnectedLobby evnt)
+    {
+        Messenger.Broadcast("UserRemovedFromLobby", evnt.UserDisplayName);
+    }
+
+    
+
     void OnGUI()
     {
         // only display max the 5 latest log messages

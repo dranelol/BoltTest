@@ -23,9 +23,15 @@ public class ServerCallbacks : GlobalEventListener
         // if not added to server's lobby, add to lobby
 
         // this will broadcast server-side only
-        Messenger.Broadcast("UserAddedToLobby", token);
+        Messenger.Broadcast("UserAddedServer", token);
 
         // tell all clients that a new user is joining the lobby so that they may update their GUIs and such
+
+        var userJoined = UserJoinedLobby.Create();
+
+        userJoined.UserDisplayName = token.DisplayName;
+
+        userJoined.Send();
 
     }
 
@@ -43,8 +49,13 @@ public class ServerCallbacks : GlobalEventListener
         CredentialToken disconnectToken = ServerManager.Instance.GetConnectedTokenByIP(connection.RemoteEndPoint.Address.ToString());
 
         // this will broadcast server-side only
-        Messenger.Broadcast("UserRemovedFromLobby", disconnectToken);
+        Messenger.Broadcast("UserRemovedServer", disconnectToken);
 
         // tell all clients that a user is leaving the lobby so that they may update their GUIs and such
+
+        var userDisconnected = UserDisconnectedLobby.Create();
+
+        userDisconnected.UserDisplayName = disconnectToken.DisplayName;
+        userDisconnected.Send();
     }
 }
